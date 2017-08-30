@@ -1,0 +1,11 @@
+{
+  "name": "bs-vue",
+  "version": "0.1.0",
+  "sources": [
+    "src"
+  ],
+  "bs-dependencies" : [
+    "bs-jest", "bs-webapi"
+  ],
+  "generate-merlin": true
+}
