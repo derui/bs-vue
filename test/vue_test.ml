@@ -1,4 +1,5 @@
 open Bs_testing
+module D = Bs_webapi.Dom
 module V = Bs_vue_vue
 
 let _ =
@@ -26,7 +27,8 @@ let _ =
                       ) (V.Component_options.make ()) in
             assert_eq 1 (V.create e (V.Component_options.make ())
                          |> I.mount
-                         |> I.children |> Array.length)
+                         |> I.el |> D.HtmlElement.childNodes
+                         |> D.NodeList.length)
         );
       Sync ("should be able to contains text element",
             fun () ->

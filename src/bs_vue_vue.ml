@@ -11,7 +11,7 @@
    - You can use pre-defined elements: div, span, a, input ...
 *)
 [%%bs.raw{|
-var _Vue = require('vue');
+var _Vue = require('vue').default;
 
 function _createComponent (fn, options) {
   return _Vue.extend({
@@ -34,8 +34,6 @@ function _newComponent(component, option) {
   return new component(option);
 }
 |}]
-
-type t
 
 type element
 type ('props, 'events, 'data) component
@@ -63,19 +61,6 @@ module VNode_data = struct
     ?keepAlive: Js.boolean ->
     ?show: Js.boolean ->
     unit -> ('prop, 'event) t = "" [@@bs.obj]
-
-  external key: ('props, 'events) t -> key_type option = "" [@@bs.get] [@@bs.return nullable]
-  external slot: ('props, 'events) t -> string option = "" [@@bs.get] [@@bs.return nullable]
-  external _ref: ('props, 'events) t -> string option = "" [@@bs.get] [@@bs.return nullable]
-  external tag: ('props, 'events) t -> string option = "" [@@bs.get] [@@bs.return nullable]
-  external staticClass: ('props, 'events) t -> string option = "" [@@bs.get] [@@bs.return nullable]
-  external props: ('props, 'events) t -> 'props option = "" [@@bs.get] [@@bs.return nullable]
-  external show_: ('props, 'events) t -> Js.boolean option = "show" [@@bs.get] [@@bs.return nullable]
-  let show t =
-    let b = show_ t in
-    match b with
-    | None -> false
-    | Some b -> Js.to_bool b
 end
 
 (* Type for VNodeData that is used by Element *)
@@ -112,12 +97,14 @@ module Component_options = struct
 end
 
 (* Type for instance of Vue component created via Vue.component *)
+type vue
 module Vue = struct
 
   external el: element -> Dom.htmlElement = "$el" [@@bs.get]
-  external parent: element -> element option = "$parent" [@@bs.send.pipe:t]
+  external parent: element -> element option = "$parent" [@@bs.send.pipe:vue]
   external root: element -> element = "$root" [@@bs.get]
-  external children: t -> element array = "$children" [@@bs.get]
+  external children: vue -> element array = "$children" [@@bs.get]
+  external nextTick: (unit -> unit [@bs]) -> unit = "" [@@bs.send.pipe:vue]
 end
 
 (* The module for extened Vue component created via Vue.extend *)
@@ -125,7 +112,7 @@ module Vue_instance = struct
 
   external mount: element -> element = "$mount" [@@bs.send]
   external el: element ->  Dom.htmlElement = "$el" [@@bs.get]
-  external parent: element -> element option = "$parent" [@@bs.send.pipe:t]
+  external parent: element -> element option = "$parent" [@@bs.send.pipe:vue]
   external root: element -> element = "$root" [@@bs.get]
   external children: element -> element array = "$children" [@@bs.get]
 
@@ -152,7 +139,7 @@ end
 (* make configuration object for component created from createComponent_ function *)
 type ('prop, 'event, 'data) render_fn = ('prop, 'event, 'data) Render_context.t -> element
 
-external vue : t = "_Vue" [@@bs.val]
+external vue : vue = "_Vue" [@@bs.val]
 external createComponent_ : ('props, 'events, 'data) render_fn ->
                             ('props, 'events, 'data) Component_options.t ->
                             ('props, 'events, 'data) component = "_createComponent" [@@bs.val]
