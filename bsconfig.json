@@ -2,10 +2,13 @@
   "name": "bs-vue",
   "version": "0.1.0",
   "sources": [
-    "src"
+    "src", {
+      "dir": "test",
+      "type": "dev"
+    }
   ],
   "bs-dependencies" : [
-    "bs-jest", "bs-webapi"
+    "bs-testing", "bs-webapi"
   ],
   "generate-merlin": true
 }
