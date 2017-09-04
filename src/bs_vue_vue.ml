@@ -35,66 +35,11 @@ function _newComponent(component, option) {
 }
 |}]
 
+module Options = Bs_vue_options
+               
 type element
 type ('props, 'events, 'data) component
 type ('props, 'data) data_fn = 'props -> 'data
-
-type key_type = [ `KeyString of string
-                | `KeyNumber of int]
-
-(* Type for VNodeData that is used by Component *)
-module VNode_data = struct
-  type ('prop, 'event) t
-
-  external make:
-    ?key: key_type ->
-    ?slot: string ->
-    ?ref: string ->
-    ?tag: string ->
-    ?staticClass: string ->
-    ?_class: _ Js.t ->
-    ?style: _ Js.t ->
-    ?props: 'prop ->
-    ?attrs: _ Js.t ->
-    ?domProps: _ Js.t ->
-    ?on: 'event Js.t ->
-    ?keepAlive: Js.boolean ->
-    ?show: Js.boolean ->
-    unit -> ('prop, 'event) t = "" [@@bs.obj]
-end
-
-(* Type for VNodeData that is used by Element *)
-module VNode_element_data = struct
-  type t = (unit, unit) VNode_data.t
-
-  external make:
-    ?key: key_type ->
-    ?slot: string ->
-    ?ref: string ->
-    ?tag: string ->
-    ?staticClass: string ->
-    ?_class: _ Js.t ->
-    ?style: _ Js.t ->
-    ?attrs: _ Js.t ->
-    ?domProps: _ Js.t ->
-    ?on: Bs_vue_event.t Js.t ->
-    ?keepAlive: Js.boolean ->
-    ?show: Js.boolean ->
-    unit -> t = "" [@@bs.obj]
-
-end
-
-module Component_options = struct
-  type ('prop, 'events, 'data) t
-
-  external make:
-    ?data: (('prop, 'events, 'data) t -> 'data [@bs.this]) ->
-    ?props: 'prop ->
-    ?methods: _ Js.t ->
-    ?name: string ->
-    unit -> ('prop, 'events, 'data) t = "" [@@bs.obj]
-
-end
 
 (* Type for instance of Vue component created via Vue.component *)
 type vue
@@ -131,9 +76,9 @@ module Render_context = struct
   external context: ('props, 'events, 'data) t -> ('props, 'events, 'data) component = "" [@@bs.get]
   external create_component: ('props, 'events, 'data) t ->
                              ('p, 'e, 'd) component ->
-                             ('p, 'e) VNode_data.t -> element array -> element = "createElement" [@@bs.send]
+                             ('p, 'e) Options.VNode_data.t -> element array -> element = "createElement" [@@bs.send]
   external create_element: ('props, 'events, 'data) t ->
-                           string -> VNode_element_data.t -> element array -> element = "createElement" [@@bs.send]
+                           string -> Options.VNode_element_data.t -> element array -> element = "createElement" [@@bs.send]
 end
 
 (* make configuration object for component created from createComponent_ function *)
@@ -141,11 +86,11 @@ type ('prop, 'event, 'data) render_fn = ('prop, 'event, 'data) Render_context.t 
 
 external vue : vue = "_Vue" [@@bs.val]
 external createComponent_ : ('props, 'events, 'data) render_fn ->
-                            ('props, 'events, 'data) Component_options.t ->
+                            ('props, 'events, 'data) Options.Component_options.t ->
                             ('props, 'events, 'data) component = "_createComponent" [@@bs.val]
 (* Create component instance via new syntax *)
 external newComponent_: ('prop, 'event, 'data) component ->
-                 ('prop, 'event, 'data) Component_options.t ->
+                 ('prop, 'event, 'data) Options.Component_options.t option ->
                  element = "_newComponent" [@@bs.val]
 
 (* Needed so that we include strings and elements as children *)

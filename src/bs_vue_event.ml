@@ -1,5 +1,5 @@
 (*
-This module defines common events of native element.
+  This module defines common events of native element.
 *)
 
 (* define types and function for event listeners for Native element. *)

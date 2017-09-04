@@ -1,18 +1,19 @@
 open Bs_testing
+
 module D = Bs_webapi.Dom
-module V = Bs_vue_vue
+module V = Bs_vue.Vue
 
 let _ =
   let module R = V.Render_context in
   let module I = V.Vue_instance in
-  let module C = V.Render_context in
+  let module O = Bs_vue.Options in
   suite "Native element" [
       Sync ("create simple element",
             fun () ->
             let e = V.component (fun ctx ->
-                        R.create_element ctx "div" (V.VNode_element_data.make ()) [||]
-                      ) (V.Component_options.make ()) in
-            assert_eq "div" (V.create e (V.Component_options.make ())
+                        R.create_element ctx "div" (O.VNode_element_data.make ()) [||]
+                      ) (O.Component_options.make ()) in
+            assert_eq "div" (V.create e None
                              |> I.mount
                              |> I.el |> Bs_webapi.Dom.HtmlElement.tagName
                              |> String.lowercase)
@@ -21,11 +22,11 @@ let _ =
       Sync ("should be able to contains some element",
             fun () ->
             let e = V.component (fun ctx ->
-                        R.create_element ctx "div" (V.VNode_element_data.make ()) [|
-                            R.create_element ctx "span" (V.VNode_element_data.make ()) [|V.text "bar"|]
+                        R.create_element ctx "div" (O.VNode_element_data.make ()) [|
+                            R.create_element ctx "span" (O.VNode_element_data.make ()) [|V.text "bar"|]
                           |]
-                      ) (V.Component_options.make ()) in
-            assert_eq 1 (V.create e (V.Component_options.make ())
+                      ) (O.Component_options.make ()) in
+            assert_eq 1 (V.create e None
                          |> I.mount
                          |> I.el |> D.HtmlElement.childNodes
                          |> D.NodeList.length)
@@ -33,11 +34,11 @@ let _ =
       Sync ("should be able to contains text element",
             fun () ->
             let e = V.component (fun ctx ->
-                        R.create_element ctx "div" (V.VNode_element_data.make ()) [|
+                        R.create_element ctx "div" (O.VNode_element_data.make ()) [|
                             V.text "foo"
                           |]
-                      ) (V.Component_options.make ()) in
-            assert_eq "foo" (V.create e (V.Component_options.make ())
+                      ) (O.Component_options.make ()) in
+            assert_eq "foo" (V.create e None
                              |> I.mount |> I.el
                              |> Bs_webapi.Dom.HtmlElement.textContent)
         )
