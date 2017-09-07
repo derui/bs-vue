@@ -36,7 +36,7 @@ function _newComponent(component, option) {
 |}]
 
 module Options = Bs_vue_options
-               
+
 type element
 type ('props, 'events, 'data) component
 type ('props, 'data) data_fn = 'props -> 'data
@@ -54,18 +54,22 @@ end
 
 (* The module for extened Vue component created via Vue.extend *)
 module Vue_instance = struct
+  type ('props, 'events, 'data) t
 
-  external mount: element -> element = "$mount" [@@bs.send]
-  external el: element ->  Dom.htmlElement = "$el" [@@bs.get]
-  external parent: element -> element option = "$parent" [@@bs.send.pipe:vue]
-  external root: element -> element = "$root" [@@bs.get]
-  external children: element -> element array = "$children" [@@bs.get]
+  external mount: ('props, 'events, 'data) t -> ('props, 'events, 'data) t = "$mount" [@@bs.send]
+  external el: ('props, 'events, 'data) t ->  Dom.htmlElement = "$el" [@@bs.get]
+  external parent: ('props, 'events, 'data) t -> element option = "$parent" [@@bs.send.pipe:vue]
+  external root: ('props, 'events, 'data) t -> element = "$root" [@@bs.get]
+  external children: ('props, 'events, 'data) t -> element array = "$children" [@@bs.get]
 
-  external props: element -> (('prop, 'event, 'data) component [@bs.ignore]) ->
+  external props: ('props, 'events, 'data) t ->
+                  (('prop, 'event, 'data) component [@bs.ignore]) ->
                   'prop = "$props" [@@bs.get]
-  external data: element -> (('prop, 'event, 'data) component [@bs.ignore]) ->
+  external data: ('props, 'events, 'data) t ->
+                 (('prop, 'event, 'data) component [@bs.ignore]) ->
                  'data = "$data" [@@bs.get]
-  external set_data: element -> (('prop, 'event, 'data) component [@bs.ignore]) ->
+  external set_data: ('props, 'events, 'data) t ->
+                     (('prop, 'event, 'data) component [@bs.ignore]) ->
                      'data -> unit = "$data" [@@bs.set]
 end
 
@@ -73,7 +77,7 @@ end
 module Render_context = struct
   type ('props, 'events, 'data) t
 
-  external context: ('props, 'events, 'data) t -> ('props, 'events, 'data) component = "" [@@bs.get]
+  external context: ('props, 'events, 'data) t -> ('props, 'events, 'data) Vue_instance.t = "" [@@bs.get]
   external create_component: ('props, 'events, 'data) t ->
                              ('p, 'e, 'd) component ->
                              ('p, 'e) Options.VNode_data.t -> element array -> element = "createElement" [@@bs.send]
@@ -91,7 +95,7 @@ external createComponent_ : ('props, 'events, 'data) render_fn ->
 (* Create component instance via new syntax *)
 external newComponent_: ('prop, 'event, 'data) component ->
                  ('prop, 'event, 'data) Options.Component_options.t option ->
-                 element = "_newComponent" [@@bs.val]
+                 ('prop, 'event, 'data) Vue_instance.t  = "_newComponent" [@@bs.val]
 
 (* Needed so that we include strings and elements as children *)
 external text : string -> element = "%identity"
