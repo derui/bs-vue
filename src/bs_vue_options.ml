@@ -4,7 +4,21 @@
 type key_type = [ `KeyString of string
                 | `KeyNumber of int]
 
-module Prop_type = struct
+module Prop_option = struct
+  type 'a t
+  type 'a validator = 'a -> bool
+
+  external make: ?required: Js.boolean ->
+                 ?default: 'a ->
+                 ?validator: 'a validator ->
+                 unit -> 'a t = "" [@@bs.obj]
+
+end
+
+type 'a props
+module type Prop_type = sig
+
+  val to_props: 'a -> 'a props
 end
 
 (* Type for VNodeData that is used by Component *)
@@ -22,7 +36,7 @@ module VNode_data = struct
     ?props: 'prop ->
     ?attrs: _ Js.t ->
     ?domProps: _ Js.t ->
-    ?on: 'event Js.t ->
+    ?on: 'event ->
     ?keepAlive: Js.boolean ->
     ?show: Js.boolean ->
     unit -> ('prop, 'event) t = "" [@@bs.obj]
@@ -42,7 +56,7 @@ module VNode_element_data = struct
     ?style: _ Js.t ->
     ?attrs: _ Js.t ->
     ?domProps: _ Js.t ->
-    ?on: Bs_vue_event.t Js.t ->
+    ?on: Bs_vue_event.t ->
     ?keepAlive: Js.boolean ->
     ?show: Js.boolean ->
     unit -> t = "" [@@bs.obj]
@@ -51,11 +65,13 @@ end
 
 module Component_options = struct
   type ('prop, 'events, 'data) t
+  type 'prop props_type_gen = unit -> 'prop props
 
   external make:
     ?data: (('prop, 'events, 'data) t -> 'data [@bs.this]) ->
-    ?props: 'prop ->
-    ?methods: _ Js.t ->
+    ?props: 'prop props ->
+    ?propsData: 'prop ->
+    ?methods: 'a ->
     ?name: string ->
     unit -> ('prop, 'events, 'data) t = "" [@@bs.obj]
 

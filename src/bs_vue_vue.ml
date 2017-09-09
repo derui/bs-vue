@@ -62,15 +62,9 @@ module Vue_instance = struct
   external root: ('props, 'events, 'data) t -> element = "$root" [@@bs.get]
   external children: ('props, 'events, 'data) t -> element array = "$children" [@@bs.get]
 
-  external props: ('props, 'events, 'data) t ->
-                  (('prop, 'event, 'data) component [@bs.ignore]) ->
-                  'prop = "$props" [@@bs.get]
-  external data: ('props, 'events, 'data) t ->
-                 (('prop, 'event, 'data) component [@bs.ignore]) ->
-                 'data = "$data" [@@bs.get]
-  external set_data: ('props, 'events, 'data) t ->
-                     (('prop, 'event, 'data) component [@bs.ignore]) ->
-                     'data -> unit = "$data" [@@bs.set]
+  external props: ('props, 'events, 'data) t -> 'props = "$props" [@@bs.get]
+  external data: ('props, 'events, 'data) t -> 'data = "$data" [@@bs.get]
+  external set_data: ('props, 'events, 'data) t -> 'data -> unit = "$data" [@@bs.set]
 end
 
 (* A context received when render function is called from Vue *)
@@ -94,7 +88,7 @@ external createComponent_ : ('props, 'events, 'data) render_fn ->
                             ('props, 'events, 'data) component = "_createComponent" [@@bs.val]
 (* Create component instance via new syntax *)
 external newComponent_: ('prop, 'event, 'data) component ->
-                 ('prop, 'event, 'data) Options.Component_options.t option ->
+                 ('prop, 'event, 'data) Options.Component_options.t ->
                  ('prop, 'event, 'data) Vue_instance.t  = "_newComponent" [@@bs.val]
 
 (* Needed so that we include strings and elements as children *)
