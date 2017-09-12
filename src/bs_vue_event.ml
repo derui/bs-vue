@@ -1,5 +1,5 @@
 (*
-  This module defines common events of native element.
+  This module defines common events of native element, and base event module for custom element.
 *)
 
 (* define types and function for event listeners for Native element. *)
@@ -15,3 +15,6 @@ external make:
   ?mousedown: listener ->
   ?mousemove: listener ->
   unit -> t = "" [@@bs.obj]
+
+
+                 (* Event type module for  *)

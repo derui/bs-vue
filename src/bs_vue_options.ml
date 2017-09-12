@@ -4,6 +4,8 @@
 type key_type = [ `KeyString of string
                 | `KeyNumber of int]
 
+type 'a props
+
 module Prop_option = struct
   type 'a t
   type 'a validator = 'a -> bool
@@ -13,12 +15,6 @@ module Prop_option = struct
                  ?validator: 'a validator ->
                  unit -> 'a t = "" [@@bs.obj]
 
-end
-
-type 'a props
-module type Prop_type = sig
-
-  val to_props: 'a -> 'a props
 end
 
 (* Type for VNodeData that is used by Component *)
