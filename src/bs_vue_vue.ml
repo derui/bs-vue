@@ -65,7 +65,7 @@ module Vue_instance = struct
   external props: ('props, 'events, 'data) t -> 'props = "$props" [@@bs.get]
   external data: ('props, 'events, 'data) t -> 'data = "$data" [@@bs.get]
   external set_data: ('props, 'events, 'data) t -> 'data -> unit = "$data" [@@bs.set]
-  external emit: string -> 'a -> unit = "$emit" [@@bs.send.pipe:('props, 'events, 'data) t]
+  external emit: string -> 'a -> ('props, 'events, 'data) t = "$emit" [@@bs.send.pipe:('props, 'events, 'data) t]
 end
 
 (* A context received when render function is called from Vue *)
