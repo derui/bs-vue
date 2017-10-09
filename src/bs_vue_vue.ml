@@ -11,23 +11,16 @@
    - You can use pre-defined elements: div, span, a, input ...
 *)
 [%%bs.raw{|
-var _Vue = require('vue').default;
+const _Vue = require('vue').default;
 
 function _createComponent (fn, options) {
-  return _Vue.extend({
-          render: function (createElement) {
-            return fn({createElement: createElement,
-                       context: this});
-          },
-          props: options.props,
-          data: function() {
-            if (!options.data) {
-              return {};
-            }
-
-            return options.data(this.$props);
-          }
+  const extendedOption = Object.assign({}, options, {
+    render: function (createElement) {
+      return fn({createElement: createElement,
+                 context: this});
+    }
   });
+  return _Vue.extend(extendedOption);
 }
 
 function _newComponent(component, option) {
