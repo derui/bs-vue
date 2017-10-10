@@ -11,9 +11,9 @@ module Prop_option = struct
   type 'a validator = 'a -> bool
 
   external make: ?required: Js.boolean ->
-                 ?default: 'a ->
-                 ?validator: 'a validator ->
-                 unit -> 'a t = "" [@@bs.obj]
+    ?default: 'a ->
+    ?validator: 'a validator ->
+    unit -> 'a t = "" [@@bs.obj]
 
 end
 

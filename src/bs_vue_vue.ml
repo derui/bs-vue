@@ -37,7 +37,6 @@ type ('props, 'data) data_fn = 'props -> 'data
 (* Type for instance of Vue component created via Vue.component *)
 type vue
 module Vue = struct
-
   external el: element -> Dom.htmlElement = "$el" [@@bs.get]
   external parent: element -> element option = "$parent" [@@bs.send.pipe:vue]
   external root: element -> element = "$root" [@@bs.get]
@@ -67,10 +66,10 @@ module Render_context = struct
 
   external context: ('props, 'events, 'data) t -> ('props, 'events, 'data) Vue_instance.t = "" [@@bs.get]
   external create_component: ('props, 'events, 'data) t ->
-                             ('p, 'e, 'd) component ->
-                             ('p, 'e) Options.VNode_data.t -> element array -> element = "createElement" [@@bs.send]
+    ('p, 'e, 'd) component ->
+    ('p, 'e) Options.VNode_data.t -> element array -> element = "createElement" [@@bs.send]
   external create_element: ('props, 'events, 'data) t ->
-                           string -> Options.VNode_element_data.t -> element array -> element = "createElement" [@@bs.send]
+    string -> Options.VNode_element_data.t -> element array -> element = "createElement" [@@bs.send]
 end
 
 (* make configuration object for component created from createComponent_ function *)
@@ -78,12 +77,12 @@ type ('prop, 'event, 'data) render_fn = ('prop, 'event, 'data) Render_context.t 
 
 external vue : vue = "_Vue" [@@bs.val]
 external createComponent_ : ('props, 'events, 'data) render_fn ->
-                            ('props, 'events, 'data) Options.Component_options.t ->
-                            ('props, 'events, 'data) component = "_createComponent" [@@bs.val]
+  ('props, 'events, 'data) Options.Component_options.t ->
+  ('props, 'events, 'data) component = "_createComponent" [@@bs.val]
 (* Create component instance via new syntax *)
 external newComponent_: ('prop, 'event, 'data) component ->
-                 ('prop, 'event, 'data) Options.Component_options.t ->
-                 ('prop, 'event, 'data) Vue_instance.t  = "_newComponent" [@@bs.val]
+  ('prop, 'event, 'data) Options.Component_options.t ->
+  ('prop, 'event, 'data) Vue_instance.t  = "_newComponent" [@@bs.val]
 
 (* Needed so that we include strings and elements as children *)
 external text : string -> element = "%identity"
@@ -92,5 +91,16 @@ external text : string -> element = "%identity"
  * We have to do this indirection so that BS exports them and can re-import them
  * as known symbols. This is less than ideal.
  *)
-let component = createComponent_
-let create = newComponent_
+let component ~render ?options () =
+  let options = match options with
+    | None -> Options.Component_options.make ()
+    | Some v -> v
+  in
+  createComponent_ render options
+
+let create ~component ?options () =
+  let options = match options with
+    | None -> Options.Component_options.make ()
+    | Some v -> v
+  in
+  newComponent_ component options
