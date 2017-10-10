@@ -11,24 +11,23 @@ let custom_event_suite () =
   let module C = struct
     type event
     module CE = struct
-      module E1 = Bs_vue.Event.Custom.Make(struct type arg = string end)
+      module E1 = Bs_vue.Custom_event.Make(struct
+          type arg = string
+          type component_event = event
 
-      type emitter = [`test of E1.arg]
+          let name = "test"
+        end)
 
       external make:
-        ?test:('prop, event, 'data) I.t E1.listener ->
+        ?test:('prop, 'data) E1.listener ->
         unit -> event = "" [@@bs.obj]
 
     end
 
-    let emit ev =
-      match ev with
-      | `test v -> I.emit "test" v
-
     type component = (unit, event, unit) V.component
     let component : component =
       V.component ~render:(fun context ->
-          R.context context |> emit (`test "foo") |> ignore;
+          R.context context |> CE.E1.emit "foo" |> ignore;
           R.create_element ~context ~tag:"div" ~elements:[|V.text "bar"|] ()
         ) ()
   end in
