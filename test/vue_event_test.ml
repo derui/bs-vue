@@ -27,25 +27,26 @@ let custom_event_suite () =
 
     type component = (unit, event, unit) V.component
     let component : component =
-      V.component ~render:(fun ctx ->
-          R.context ctx |> emit (`test "foo") |> ignore;
-          R.create_element ctx "div" (O.VNode_element_data.make ()) [|V.text "bar"|]
+      V.component ~render:(fun context ->
+          R.context context |> emit (`test "foo") |> ignore;
+          R.create_element ~context ~tag:"div" ~elements:[|V.text "bar"|] ()
         ) ()
-  end
-  in
+  end in
 
   suite "Custom event" [
     Async ("should be able to call custom event",
            fun () ->
              Js.Promise.make (fun ~resolve ~reject:_ ->
                  let component =
-                   V.component ~render:(fun ctx ->
+                   V.component ~render:(fun context ->
                        let events =
                          C.CE.make
                            ~test:(fun [@bs.this] _ v -> resolve (assert_eq "foo" v) [@bs] |> ignore)
                            ()
                        in
-                       R.create_component ctx C.component (O.VNode_data.make ~on:events ()) [||]
+                       R.create_component ~context ~component:C.component
+                         ~options:(O.VNode_data.make ~on:events ())
+                         ()
                      ) () in
                  (V.create ~component ()
                   |> I.mount
@@ -63,13 +64,14 @@ let _ =
     Async ("should call native event",
            fun () ->
              Js.Promise.make (fun ~resolve ~reject:_ ->
-                 let component = V.component ~render:(fun ctx ->
+                 let component = V.component ~render:(fun context ->
                      let events =
                        Bs_vue.Event.make
                          ~click:(fun _ -> resolve (assert_ok true) [@bs] |> ignore)
                          ()
                      in
-                     R.create_element ctx "div" (O.VNode_element_data.make ~on:events ()) [||]
+                     R.create_element ~context ~tag:"div"
+                       ~options:(O.VNode_element_data.make ~on:events ()) ()
                    ) () in
                  (V.create ~component ()
                   |> I.mount

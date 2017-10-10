@@ -65,11 +65,22 @@ module Render_context = struct
   type ('props, 'events, 'data) t
 
   external context: ('props, 'events, 'data) t -> ('props, 'events, 'data) Vue_instance.t = "" [@@bs.get]
-  external create_component: ('props, 'events, 'data) t ->
+  external createComponent_: ('props, 'events, 'data) t ->
     ('p, 'e, 'd) component ->
     ('p, 'e) Options.VNode_data.t -> element array -> element = "createElement" [@@bs.send]
-  external create_element: ('props, 'events, 'data) t ->
+  external createElement_: ('props, 'events, 'data) t ->
     string -> Options.VNode_element_data.t -> element array -> element = "createElement" [@@bs.send]
+
+  let create_component ~context ~component ?options ?elements () =
+    let options = Js_option.default (Options.VNode_data.make ()) options
+    and elements = Js_option.default [||] elements in
+    createComponent_ context component options elements
+
+  let create_element ~context ~tag ?options ?elements () =
+    let options = Js_option.default (Options.VNode_element_data.make ()) options
+    and elements = Js_option.default [||] elements in
+    createElement_ context tag options elements
+
 end
 
 (* make configuration object for component created from createComponent_ function *)

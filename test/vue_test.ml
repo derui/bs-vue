@@ -18,11 +18,9 @@ let custom_component_suite () =
     let to_props _ = make_props_def ~message:(O.Prop_option.make ~required:(Js.true_) ())
 
     let component = V.component
-        ~render:(fun ctx ->
-            let prop = V.Render_context.context ctx |> V.Vue_instance.props in
-            V.Render_context.create_element ctx "div"
-              (O.VNode_element_data.make ())
-              [|V.text prop##message|]
+        ~render:(fun context ->
+            let prop = V.Render_context.context context |> V.Vue_instance.props in
+            V.Render_context.create_element ~context ~tag:"div" ~elements:[|V.text prop##message|] ()
           )
         ~options:(O.Component_options.make ~props:(to_props ()) ())
         ()
@@ -50,9 +48,7 @@ let _ =
     Sync ("create simple element",
           fun () ->
             let component = V.component
-                ~render:(fun ctx ->
-                    R.create_element ctx "div" (O.VNode_element_data.make ()) [||]
-                  )
+                ~render:(fun context -> R.create_element ~context ~tag:"div" ())
                 ()
             in
             assert_eq "div" (V.create ~component ()
@@ -64,10 +60,10 @@ let _ =
     Sync ("should be able to contains some element",
           fun () ->
             let component = V.component
-                ~render:(fun ctx ->
-                    R.create_element ctx "div" (O.VNode_element_data.make ()) [|
-                      R.create_element ctx "span" (O.VNode_element_data.make ()) [|V.text "bar"|]
-                    |]
+                ~render:(fun context ->
+                    R.create_element ~context ~tag:"div"  ~elements:[|
+                      R.create_element ~context ~tag:"span" ~elements:[|V.text "bar"|] ()
+                    |] ()
                   )
                 ~options:(O.Component_options.make ()) () in
             assert_eq 1 (V.create ~component ()
@@ -78,10 +74,10 @@ let _ =
     Sync ("should be able to contains text element",
           fun () ->
             let component = V.component
-                ~render:(fun ctx ->
-                    R.create_element ctx "div" (O.VNode_element_data.make ()) [|
+                ~render:(fun context ->
+                    R.create_element ~context ~tag:"div" ~elements:[|
                       V.text "foo"
-                    |]
+                    |] ()
                   )
                 () in
             assert_eq "foo" (V.create ~component ()
